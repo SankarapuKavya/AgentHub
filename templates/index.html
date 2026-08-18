@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AgentStudio</title>
+<!-- Tabler Icons — exactly as in reference HTML -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<!-- Inter font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR — fixed left, exactly matching reference -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark"><i class="ti ti-cpu"></i></div>
+    <div>
+      <div class="logo-text">AgentStudio</div>
+      <div class="logo-sub">Workspace</div>
+    </div>
+  </div>
+
+  <div class="nav" id="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <a class="nav-item active" data-page="dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+      <a class="nav-item" data-page="agents"><i class="ti ti-cpu"></i> Agents <span class="nav-badge" id="cnt-agents">0</span></a>
+      <a class="nav-item" data-page="runs"><i class="ti ti-player-play"></i> Runs <span class="nav-badge" id="cnt-runs">0</span></a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Build</div>
+      <a class="nav-item" data-page="pipelines"><i class="ti ti-git-branch"></i> Pipelines <span class="nav-badge" id="cnt-pipes">0</span></a>
+      <a class="nav-item" data-page="files"><i class="ti ti-database"></i> Datasets <span class="nav-badge" id="cnt-files">0</span></a>
+      <a class="nav-item" data-page="run"><i class="ti ti-bolt"></i> Execute</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Manage</div>
+      <a class="nav-item" data-page="history"><i class="ti ti-history"></i> History</a>
+      <a class="nav-item" id="nav-settings-btn"><i class="ti ti-settings"></i> Settings</a>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="avatar-row" id="btn-theme-toggle">
+      <div class="avatar" id="theme-avatar-icon"><i class="ti ti-moon" style="font-size:13px"></i></div>
+      <div>
+        <div class="avatar-name" id="theme-label">Dark mode</div>
+        <div class="avatar-role">Click to switch</div>
+      </div>
+      <i class="ti ti-chevron-right" style="font-size:13px;color:var(--t3);margin-left:auto"></i>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <section class="page active" id="page-dashboard">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="greeting-text">Good morning</h1>
+        <p id="greeting-sub">0 agents configured · ready to run</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-primary" onclick="navTo('agents');setTimeout(()=>document.getElementById('btn-new-agent').click(),80)"><i class="ti ti-plus"></i> New agent</button>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label"><i class="ti ti-cpu"></i> Total agents</div>
+        <div class="stat-value" id="stat-agents">0</div>
+        <div class="stat-delta" id="stat-agents-delta">No agents yet</div>
+        <div class="sparkline"><div class="spark-bar" style="height:40%"></div><div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:50%"></div><div class="spark-bar" style="height:70%"></div><div class="spark-bar active" style="height:100%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="ti ti-git-branch"></i> Pipelines</div>
+        <div class="stat-value" id="stat-pipes">0</div>
+        <div class="stat-delta" id="stat-pipes-delta">No pipelines yet</div>
+        <div class="sparkline"><div class="spark-bar" style="height:30%"></div><div class="spark-bar" style="height:45%"></div><div class="spark-bar" style="height:60%"></div><div class="spark-bar active" style="height:80%"></div><div class="spark-bar" style="height:70%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="ti ti-history"></i> Total runs</div>
+        <div class="stat-value" id="stat-runs">0</div>
+        <div class="stat-delta" id="stat-runs-delta">No runs yet</div>
+        <div class="sparkline"><div class="spark-bar" style="height:45%"></div><div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:75%"></div><div class="spark-bar active" style="height:90%"></div><div class="spark-bar" style="height:80%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="ti ti-database"></i> Datasets</div>
+        <div class="stat-value" id="stat-files">0</div>
+        <div class="stat-delta" id="stat-files-delta">No files yet</div>
+        <div class="sparkline"><div class="spark-bar" style="height:20%"></div><div class="spark-bar" style="height:35%"></div><div class="spark-bar" style="height:30%"></div><div class="spark-bar active" style="height:60%"></div><div class="spark-bar" style="height:55%"></div></div>
+      </div>
+    </div>
+
+    <!-- Two col layout -->
+    <div class="two-col">
+      <div>
+        <div class="section-header">
+          <span class="section-title">Agents</span>
+          <span class="section-link" onclick="navTo('agents')">View all ↗</span>
+        </div>
+        <div class="agents-grid" id="dash-agents-grid">
+          <div class="agent-card dashed-card" onclick="navTo('agents');setTimeout(()=>document.getElementById('btn-new-agent').click(),80)">
+            <i class="ti ti-plus" style="font-size:22px;color:var(--t3)"></i>
+            <span style="font-size:13px;color:var(--t2)">Create agent ↗</span>
+          </div>
+        </div>
+      </div>
+      <div class="right-col">
+        <div class="card">
+          <div class="section-header"><span class="section-title">Quick actions</span></div>
+          <div class="quick-actions">
+            <button class="quick-btn" onclick="navTo('agents');setTimeout(()=>document.getElementById('btn-new-agent').click(),80)">
+              <i class="ti ti-cpu"></i><span>New agent</span><small>From scratch</small>
+            </button>
+            <button class="quick-btn" onclick="navTo('pipelines');setTimeout(()=>document.getElementById('btn-new-pipe').click(),80)">
+              <i class="ti ti-git-branch"></i><span>New pipeline</span><small>Chain agents</small>
+            </button>
+            <button class="quick-btn" onclick="navTo('run')">
+              <i class="ti ti-bolt"></i><span>Run pipeline</span><small>Execute now</small>
+            </button>
+            <button class="quick-btn" onclick="navTo('files');setTimeout(()=>document.getElementById('btn-upload-file').click(),80)">
+              <i class="ti ti-upload"></i><span>Upload data</span><small>Add datasets</small>
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-header">
+            <span class="section-title">Recent activity</span>
+            <span class="section-link" onclick="navTo('history')">All logs ↗</span>
+          </div>
+          <div class="activity-list" id="dash-activity-list">
+            <div class="activity-item">
+              <div class="activity-dot info"></div>
+              <div><div class="activity-text">Welcome to AgentStudio</div><div class="activity-time">Now</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AGENTS -->
+  <section class="page hidden" id="page-agents">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Agents</h1><p>Individual AI workers with a defined role and output format</p></div>
+      <div class="topbar-actions">
+        <button class="btn-primary" id="btn-new-agent"><i class="ti ti-plus"></i> New agent</button>
+      </div>
+    </div>
+    <div class="agents-grid-full" id="agents-grid"></div>
+  </section>
+
+  <!-- PIPELINES -->
+  <section class="page hidden" id="page-pipelines">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Pipelines</h1><p>Chain agents and review checkpoints into workflows</p></div>
+      <div class="topbar-actions">
+        <button class="btn-primary" id="btn-new-pipe"><i class="ti ti-plus"></i> New pipeline</button>
+      </div>
+    </div>
+    <div class="agents-grid-full" id="pipes-grid"></div>
+  </section>
+
+  <!-- RUNS — Execute -->
+  <section class="page hidden" id="page-run">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Execute Pipeline</h1><p>Run a pipeline — Human-in-Loop steps pause for your review</p></div>
+    </div>
+    <div class="run-layout">
+      <!-- Left: inputs -->
+      <div class="run-form-panel">
+        <div class="form-section">
+          <div class="ff"><label>Pipeline</label>
+            <div class="ss-root" id="ss-pipe">
+              <div class="ss-trig"><i class="ti ti-search" style="color:var(--t3);font-size:14px;flex-shrink:0"></i><input class="ss-inp" id="ss-pipe-inp" placeholder="Search pipelines…" autocomplete="off"/><button class="ss-x hidden" id="ss-pipe-x"><i class="ti ti-x" style="font-size:12px"></i></button></div>
+              <div class="ss-menu hidden" id="ss-pipe-menu"></div>
+            </div>
+            <input type="hidden" id="pipe-val"/>
+          </div>
+          <div class="flow-preview hidden" id="flow-preview"><div class="flow-chips" id="flow-chips"></div></div>
+          <div class="ff"><label>Text Input <em>optional if files provided</em></label><textarea id="run-text" rows="5" placeholder="Describe the task, paste content, or ask a question…"></textarea></div>
+          <div class="ff"><label>Datasets <em>click to select</em></label><div class="file-picker" id="file-picker"></div></div>
+          <div class="ff"><label>Upload a File <em>optional</em></label>
+            <div class="dropzone" id="dropzone"><input type="file" id="run-upload" hidden/>
+              <i class="ti ti-cloud-upload" style="font-size:22px;flex-shrink:0"></i>
+              <div><p class="dz-main" id="dz-lbl">Drop or click to upload</p><p class="dz-sub">PDF · DOCX · XLSX · TXT · CSV</p></div>
+            </div>
+          </div>
+          <button class="btn-execute" id="btn-execute">
+            <i class="ti ti-bolt"></i>
+            <span id="exec-lbl">Execute Pipeline</span>
+          </button>
+        </div>
+      </div>
+      <!-- Right: output -->
+      <div class="run-output-panel">
+        <div class="out-empty" id="out-empty">
+          <i class="ti ti-player-play" style="font-size:28px;opacity:.25"></i>
+          <p>Output appears here after running</p>
+        </div>
+        <div class="out-panel hidden" id="out-panel">
+          <div class="out-panel-hd">
+            <span class="section-title">Live Output</span>
+            <div id="out-acts"></div>
+          </div>
+          <div id="token-bar-container"></div>
+          <div class="timeline" id="out-timeline"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATASETS / FILES -->
+  <section class="page hidden" id="page-files">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Datasets</h1><p>Upload files once, reference in any pipeline run</p></div>
+      <div class="topbar-actions">
+        <button class="btn-primary" id="btn-upload-file"><i class="ti ti-upload"></i> Upload files</button>
+      </div>
+    </div>
+    <input type="file" id="file-upload-input" hidden multiple/>
+    <div class="agents-grid-full" id="files-grid"></div>
+  </section>
+
+  <!-- HISTORY / RUNS LIST -->
+  <section class="page hidden" id="page-runs">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Runs</h1><p>All pipeline executions</p></div>
+      <div class="topbar-actions">
+        <div class="search-box"><i class="ti ti-search"></i><input type="text" id="hist-q" placeholder="Search runs…"/></div>
+      </div>
+    </div>
+    <div id="hist-rows"></div>
+  </section>
+
+  <!-- HISTORY PAGE (alias) -->
+  <section class="page hidden" id="page-history">
+    <div class="topbar">
+      <div class="topbar-left"><h1>History</h1><p>All past pipeline executions</p></div>
+      <div class="topbar-actions">
+        <div class="search-box"><i class="ti ti-search"></i><input type="text" id="hist-q2" placeholder="Search runs…"/></div>
+      </div>
+    </div>
+    <div id="hist-rows2"></div>
+  </section>
+
+</main>
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- Settings -->
+<div class="modal-bg hidden" id="modal-settings">
+  <div class="modal"><div class="modal-hd"><h2>LLM Settings</h2><button class="modal-close" data-close="modal-settings"><i class="ti ti-x"></i></button></div>
+  <div class="modal-bd">
+    <div class="presets-row"><p class="presets-lbl">Quick presets</p><div class="presets"><button class="preset" data-p="groq">Groq</button><button class="preset" data-p="openai">OpenAI</button><button class="preset" data-p="gemini">Gemini</button><button class="preset" data-p="claude">Claude</button><button class="preset" data-p="ollama">Ollama</button></div></div>
+    <div class="ff"><label>Provider</label><div class="radio-row"><label class="rl"><input type="radio" name="s-prov" value="openai" checked/> OpenAI-compatible</label><label class="rl"><input type="radio" name="s-prov" value="gemini"/> Gemini</label></div></div>
+    <div class="ff"><label>API URL</label><input type="text" id="s-url" placeholder="https://api.groq.com/openai/v1"/></div>
+    <div class="ff"><label>API Key</label><div class="pw-row"><input type="password" id="s-key" placeholder="Paste your API key…"/><button class="pw-show" id="pw-show">Show</button></div><span class="key-hint hidden" id="key-hint"></span></div>
+    <div class="ff"><label>Model</label><input type="text" id="s-model" placeholder="meta-llama/llama-4-scout-17b-16e-instruct"/></div>
+    <div class="llm-status-row" id="llm-status-row"></div>
+    <details class="ref-det"><summary>Provider reference</summary><table class="ref-tbl"><thead><tr><th>Provider</th><th>API URL</th><th>Model</th></tr></thead><tbody>
+      <tr><td>Groq</td><td>https://api.groq.com/openai/v1</td><td>llama-3.1-8b-instant</td></tr>
+      <tr><td>OpenAI</td><td>https://api.openai.com/v1</td><td>gpt-4o</td></tr>
+      <tr><td>Gemini</td><td>https://generativelanguage.googleapis.com/v1beta</td><td>gemini-2.0-flash</td></tr>
+      <tr><td>Claude</td><td>https://api.anthropic.com/v1</td><td>claude-3-5-sonnet-20241022</td></tr>
+      <tr><td>Ollama</td><td>http://localhost:11434/v1</td><td>llama3.2</td></tr>
+    </tbody></table></details>
+  </div>
+  <div class="modal-ft"><button class="btn-ghost" data-close="modal-settings">Cancel</button><button class="btn-primary" id="btn-save-settings"><i class="ti ti-check"></i> Save</button></div></div>
+</div>
+
+<!-- Agent Modal -->
+<div class="modal-bg hidden" id="modal-agent">
+  <div class="modal"><div class="modal-hd"><h2 id="modal-agent-title">New Agent</h2><button class="modal-close" data-close="modal-agent"><i class="ti ti-x"></i></button></div>
+  <div class="modal-bd">
+    <div class="form-2col"><div class="ff"><label>Name <span class="req">*</span></label><input type="text" id="ag-name" placeholder="e.g. Research Analyst"/></div><div class="ff"><label>Description</label><input type="text" id="ag-desc" placeholder="What does this agent do?"/></div></div>
+    <div class="ff"><label>System Prompt <span class="req">*</span><span class="fmt-ll">Detects: <strong id="fmt-live">TXT</strong></span></label><textarea id="ag-prompt" rows="9" placeholder="You are a senior analyst. Extract insights and produce an Excel report with…"></textarea></div>
+    <div class="fmt-banner hidden" id="fmt-banner"><i class="ti ti-check"></i> Output formats detected: <span id="fmt-tags"></span></div>
+    <div class="repo-tip"><strong><i class="ti ti-folder-code"></i> Code Repository</strong> — mention <code>repository</code>, <code>code project</code>, or <code>codebase</code> in your prompt to generate a real downloadable folder structure.</div>
+  </div>
+  <div class="modal-ft"><button class="btn-ghost" data-close="modal-agent">Cancel</button><button class="btn-primary" id="btn-save-agent"><i class="ti ti-check"></i> Save agent</button></div>
+  <input type="hidden" id="ag-id"/></div>
+</div>
+
+<!-- Pipeline Modal -->
+<div class="modal-bg hidden" id="modal-pipe">
+  <div class="modal modal-wide"><div class="modal-hd"><h2 id="modal-pipe-title">New Pipeline</h2><button class="modal-close" data-close="modal-pipe"><i class="ti ti-x"></i></button></div>
+  <div class="modal-bd">
+    <div class="form-2col"><div class="ff"><label>Name <span class="req">*</span></label><input type="text" id="sa-name" placeholder="e.g. Research → Report"/></div><div class="ff"><label>Description</label><input type="text" id="sa-desc" placeholder="What does this pipeline produce?"/></div></div>
+    <div class="pipe-builder">
+      <div class="pb-toolbar"><span class="pb-lbl">Flow Steps</span>
+        <div class="pb-add-row">
+          <div class="ss-root agent-ss" id="ss-agent"><div class="ss-trig"><i class="ti ti-search" style="color:var(--t3);font-size:14px;flex-shrink:0"></i><input class="ss-inp" id="ss-agent-inp" placeholder="Search agents…" autocomplete="off"/></div><div class="ss-menu hidden" id="ss-agent-menu"></div></div>
+          <button class="btn-ghost" id="btn-add-agent-step"><i class="ti ti-plus"></i> Add agent</button>
+          <button class="btn-hil-add" id="btn-add-hil-step"><i class="ti ti-user-check"></i> Human review</button>
+        </div>
+      </div>
+      <div class="swimlane"><div class="sl-cap sl-start">START</div><div class="sl-nodes" id="sl-nodes"></div><div class="sl-cap sl-end">END</div></div>
+      <p class="sl-tip"><i class="ti ti-arrows-sort"></i> Drag to reorder · Human review pauses the pipeline and re-runs the previous step on your feedback</p>
+    </div>
+  </div>
+  <div class="modal-ft"><button class="btn-ghost" data-close="modal-pipe">Cancel</button><button class="btn-primary" id="btn-save-pipe"><i class="ti ti-check"></i> Save pipeline</button></div>
+  <input type="hidden" id="sa-id"/></div>
+</div>
+
+<!-- Delete -->
+<div class="modal-bg hidden" id="modal-del">
+  <div class="modal modal-sm"><div class="modal-hd"><h2>Delete?</h2><button class="modal-close" data-close="modal-del"><i class="ti ti-x"></i></button></div>
+  <div class="modal-bd"><p id="del-msg" style="color:var(--t2);line-height:1.6"></p></div>
+  <div class="modal-ft"><button class="btn-ghost" data-close="modal-del">Keep it</button><button class="btn-danger" id="btn-del-ok">Delete</button></div></div>
+</div>
+
+<!-- Run Detail -->
+<div class="modal-bg hidden" id="modal-run-detail">
+  <div class="modal modal-wide"><div class="modal-hd"><h2 id="run-detail-title">Run Detail</h2><button class="modal-close" data-close="modal-run-detail"><i class="ti ti-x"></i></button></div>
+  <div class="modal-bd" id="run-detail-bd"></div>
+  <div class="modal-ft"><button class="btn-ghost" data-close="modal-run-detail">Close</button></div></div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
